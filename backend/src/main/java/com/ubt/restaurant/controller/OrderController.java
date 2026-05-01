@@ -14,10 +14,23 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
+
+    private static final Set<String> VALID_STATUSES = Set.of(
+        "PENDING", "IN_PROGRESS", "DELIVERED", "PAID", "CANCELLED"
+    );
+
+    private static final Map<String, Set<String>> ALLOWED_TRANSITIONS = Map.of(
+        "PENDING",     Set.of("IN_PROGRESS", "CANCELLED"),
+        "IN_PROGRESS", Set.of("DELIVERED", "CANCELLED"),
+        "DELIVERED",   Set.of("PAID", "CANCELLED"),
+        "PAID",        Set.of(),       // perfundimtar
+        "CANCELLED",   Set.of()        // perfundimtar
+    );
 
     private final OrderRepository orderRepo;
     private final OrderItemRepository itemRepo;
@@ -91,8 +104,18 @@ public class OrderController {
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<OrderEntity> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        String newStatus = body.get("status");
+        if (newStatus == null || !VALID_STATUSES.contains(newStatus)) {
+            throw new ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST,
+                "Status i pavlefshem. Vlerat e pranueshme: " + VALID_STATUSES);
+        }
         return orderRepo.findById(id).map(existing -> {
-            existing.setStatus(body.get("status"));
+            Set<String> allowed = ALLOWED_TRANSITIONS.getOrDefault(existing.getStatus(), Set.of());
+            if (!allowed.contains(newStatus)) {
+                throw new ResponseStatusException(org.springframework.http.HttpStatus.CONFLICT,
+                    "Tranzicion i pavlefshem nga " + existing.getStatus() + " ne " + newStatus);
+            }
+            existing.setStatus(newStatus);
             return ResponseEntity.ok(orderRepo.save(existing));
         }).orElse(ResponseEntity.notFound().build());
     }
