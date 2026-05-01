@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
+import jakarta.validation.constraints.*;
+
 @Entity
 @Table(name = "menu_items")
 public class MenuItem {
@@ -11,12 +13,16 @@ public class MenuItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Emertimi i detyrueshem")
+    @Size(max = 100)
     @Column(nullable = false)
     private String name;
 
     @Column(length = 1000)
     private String description;
 
+    @NotNull
+    @DecimalMin(value = "0.0", inclusive = true, message = "Cmimi >= 0")
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 

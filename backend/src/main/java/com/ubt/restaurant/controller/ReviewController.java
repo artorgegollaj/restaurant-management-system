@@ -2,6 +2,9 @@ package com.ubt.restaurant.controller;
 
 import com.ubt.restaurant.entity.Review;
 import com.ubt.restaurant.repository.ReviewRepository;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,13 +27,13 @@ public class ReviewController {
     }
 
     @PostMapping
-    public Review create(@RequestBody Review r) {
+    public Review create(@Valid @RequestBody Review r) {
         r.setId(null);
         return repo.save(r);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Review> update(@PathVariable Long id, @RequestBody Review r) {
+    public ResponseEntity<Review> update(@PathVariable Long id, @Valid @RequestBody Review r) {
         return repo.findById(id).map(existing -> {
             existing.setCustomerName(r.getCustomerName());
             existing.setRating(r.getRating());

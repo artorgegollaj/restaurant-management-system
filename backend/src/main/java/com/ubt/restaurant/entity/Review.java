@@ -1,7 +1,14 @@
 package com.ubt.restaurant.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalDate;
+
+import jakarta.validation.constraints.*;
+
 
 @Entity
 @Table(name = "reviews")
@@ -14,9 +21,11 @@ public class Review {
     private String customerName;
 
     @Column(nullable = false)
+    @NotNull @Min(1) @Max(5)
     private Integer rating;
 
     @Column(length = 1000)
+    @Size(max = 1000)
     private String comment;
 
     @Column(nullable = false)

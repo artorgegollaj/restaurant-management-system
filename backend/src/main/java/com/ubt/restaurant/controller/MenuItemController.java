@@ -6,6 +6,9 @@ import com.ubt.restaurant.repository.MenuItemRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.*;
+
+
 import java.util.List;
 
 @RestController
@@ -29,7 +32,7 @@ public class MenuItemController {
     }
 
     @PostMapping
-    public MenuItem create(@RequestBody MenuItem m) {
+    public MenuItem create(@Valid @RequestBody MenuItem m) {
         m.setId(null);
         if (m.getCategory() != null && m.getCategory().getId() != null) {
             m.setCategory(categoryRepo.findById(m.getCategory().getId()).orElse(null));
@@ -38,7 +41,7 @@ public class MenuItemController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MenuItem> update(@PathVariable Long id, @RequestBody MenuItem m) {
+    public ResponseEntity<MenuItem> update(@PathVariable Long id, @Valid @RequestBody MenuItem m) {
         return repo.findById(id).map(existing -> {
             existing.setName(m.getName());
             existing.setDescription(m.getDescription());

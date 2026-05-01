@@ -17,6 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -61,6 +64,56 @@ public class AuthController {
         userRepo.save(user);
 
         return ResponseEntity.ok(Map.of("message", "User registered"));
+    }
+        public record RegisterRequest(
+        @NotBlank(message = "Username eshte i detyrueshem")
+        @Size(min = 3, max = 50, message = "Username 3-50 karaktere")
+        String username,
+
+        @NotBlank @Email(message = "Email i pavlefshem")
+        String email,
+
+        @NotBlank @Size(min = 6, message = "Min 6 karaktere")
+        String password
+    ) {}
+
+    public record LoginRequest(
+        @NotBlank String username,
+        @NotBlank String password
+    ) {}
+
+    public record RefreshRequest(@NotBlank String refreshToken) {}
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest req) {
+        if (userRepo.existsByUsername(req.username())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Username already taken"));
+        }
+        if (userRepo.existsByEmail(req.email())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Email already used"));
+        }
+        Role role = roleRepo.findByName("USER").orElseGet(() -> roleRepo.save(new Role("USER")));
+        User user = new User();
+        user.setUsername(req.username());
+        user.setEmail(req.email());
+        user.setPassword(encoder.encode(req.password()));
+        user.setRoles(Set.of(role));
+        userRepo.save(user);
+        return ResponseEntity.ok(Map.of("message", "User registered"));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
+        authManager.authenticate(new UsernamePasswordAuthenticationToken(req.username(), req.password()));
+        User user = userRepo.findByUsername(req.username()).orElseThrow();
+        String accessToken = jwtService.generateAccessToken(req.username());
+        RefreshToken refreshToken = refreshService.create(user);
+        return ResponseEntity.ok(Map.of(
+            "accessToken", accessToken,
+            "refreshToken", refreshToken.getToken(),
+            "username", user.getUsername(),
+            "roles", user.getRoles().stream().map(Role::getName).toList()
+        ));
     }
 
     @PostMapping("/login")
