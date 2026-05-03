@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard.jsx';
 import Users from './pages/Users.jsx';
 import CrudPage from './components/CrudPage.jsx';
 import { configs } from './crudConfigs.js';
+import Reviews from './pages/Reviews.jsx';
 
 const Protected = observer(({ children }) => {
   return authStore.isAuthenticated ? children : <Navigate to="/login" replace />;
@@ -38,6 +39,7 @@ function App() {
         <Route path="staff" element={<CrudPage config={configs.staff} />} />
         <Route path="payments" element={<CrudPage config={configs.payments} />} />
         <Route path="reviews" element={<CrudPage config={configs.reviews} />} />
+        <Route path="/reviews" element={<Reviews />} />
         <Route path="ingredients" element={<CrudPage config={configs.ingredients} />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
