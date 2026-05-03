@@ -2,6 +2,7 @@ package com.ubt.restaurant.controller;
 
 import com.ubt.restaurant.repository.OrderItemRepository;
 import com.ubt.restaurant.repository.OrderRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,7 @@ public class DashboardController {
         this.orderItemRepo = orderItemRepo;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @GetMapping("/summary")
     public Map<String, Object> summary() {
         LocalDate today = LocalDate.now();
@@ -56,6 +58,7 @@ public class DashboardController {
         return res;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @GetMapping("/sales-report")
     public Map<String, Object> salesReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,

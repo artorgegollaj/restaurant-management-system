@@ -8,6 +8,7 @@ import com.ubt.restaurant.repository.OrderItemRepository;
 import com.ubt.restaurant.repository.OrderRepository;
 import com.ubt.restaurant.repository.RestaurantTableRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -56,6 +57,7 @@ public class OrderController {
         return orderRepo.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'WAITER')")
     @PostMapping
     public OrderEntity create(@RequestBody OrderRequest req) {
         if (req.items() == null || req.items().isEmpty()) {
@@ -102,6 +104,7 @@ public class OrderController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'WAITER')")
     @PatchMapping("/{id}/status")
     public ResponseEntity<OrderEntity> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String newStatus = body.get("status");
@@ -120,6 +123,7 @@ public class OrderController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (!orderRepo.existsById(id)) return ResponseEntity.notFound().build();

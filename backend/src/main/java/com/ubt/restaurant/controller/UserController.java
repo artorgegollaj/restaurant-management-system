@@ -5,6 +5,7 @@ import com.ubt.restaurant.entity.User;
 import com.ubt.restaurant.repository.RoleRepository;
 import com.ubt.restaurant.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,6 +39,7 @@ public class UserController {
         return m;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @GetMapping
     public List<Map<String, Object>> getAll() {
         return userRepo.findAll().stream().map(this::toView).toList();
@@ -85,6 +87,7 @@ public class UserController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (!userRepo.existsById(id)) return ResponseEntity.notFound().build();

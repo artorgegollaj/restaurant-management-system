@@ -4,6 +4,7 @@ import com.ubt.restaurant.entity.MenuItem;
 import com.ubt.restaurant.repository.MenuCategoryRepository;
 import com.ubt.restaurant.repository.MenuItemRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.*;
@@ -31,6 +32,7 @@ public class MenuItemController {
         return repo.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @PostMapping
     public MenuItem create(@Valid @RequestBody MenuItem m) {
         m.setId(null);
@@ -40,6 +42,7 @@ public class MenuItemController {
         return repo.save(m);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @PutMapping("/{id}")
     public ResponseEntity<MenuItem> update(@PathVariable Long id, @Valid @RequestBody MenuItem m) {
         return repo.findById(id).map(existing -> {
@@ -55,6 +58,7 @@ public class MenuItemController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (!repo.existsById(id)) return ResponseEntity.notFound().build();
