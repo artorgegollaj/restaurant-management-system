@@ -67,4 +67,8 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration cfg) throws Exception {
         return cfg.getAuthenticationManager();
     }
+
+
+    .requestMatchers("/uploads/**").permitAll()
+.requestMatchers("/api/upload/**").authenticated()
 }
