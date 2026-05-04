@@ -17,6 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -38,48 +41,55 @@ public class AuthController {
         this.refreshService = refreshService;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody Map<String, String> body) {
-        String username = body.get("username");
-        String email = body.get("email");
-        String password = body.get("password");
+    public record RegisterRequest(
+        @NotBlank(message = "Username eshte i detyrueshem")
+        @Size(min = 3, max = 50, message = "Username 3-50 karaktere")
+        String username,
 
-        if (userRepo.existsByUsername(username)) {
+        @NotBlank @Email(message = "Email i pavlefshem")
+        String email,
+
+        @NotBlank @Size(min = 6, message = "Min 6 karaktere")
+        String password
+    ) {}
+
+    public record LoginRequest(
+        @NotBlank String username,
+        @NotBlank String password
+    ) {}
+
+    public record RefreshRequest(@NotBlank String refreshToken) {}
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest req) {
+        if (userRepo.existsByUsername(req.username())) {
             return ResponseEntity.badRequest().body(Map.of("error", "Username already taken"));
         }
-        if (userRepo.existsByEmail(email)) {
+        if (userRepo.existsByEmail(req.email())) {
             return ResponseEntity.badRequest().body(Map.of("error", "Email already used"));
         }
-
         Role role = roleRepo.findByName("USER").orElseGet(() -> roleRepo.save(new Role("USER")));
-
         User user = new User();
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setPassword(encoder.encode(password));
+        user.setUsername(req.username());
+        user.setEmail(req.email());
+        user.setPassword(encoder.encode(req.password()));
         user.setRoles(Set.of(role));
         userRepo.save(user);
-
         return ResponseEntity.ok(Map.of("message", "User registered"));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
-        String username = body.get("username");
-        String password = body.get("password");
-
-        authManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-
-        User user = userRepo.findByUsername(username).orElseThrow();
-        String accessToken = jwtService.generateAccessToken(username);
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
+        authManager.authenticate(new UsernamePasswordAuthenticationToken(req.username(), req.password()));
+        User user = userRepo.findByUsername(req.username()).orElseThrow();
+        String accessToken = jwtService.generateAccessToken(req.username());
         RefreshToken refreshToken = refreshService.create(user);
-
-        Map<String, Object> res = new HashMap<>();
-        res.put("accessToken", accessToken);
-        res.put("refreshToken", refreshToken.getToken());
-        res.put("username", user.getUsername());
-        res.put("roles", user.getRoles().stream().map(Role::getName).toList());
-        return ResponseEntity.ok(res);
+        return ResponseEntity.ok(Map.of(
+            "accessToken", accessToken,
+            "refreshToken", refreshToken.getToken(),
+            "username", user.getUsername(),
+            "roles", user.getRoles().stream().map(Role::getName).toList()
+        ));
     }
 
     @PostMapping("/refresh")

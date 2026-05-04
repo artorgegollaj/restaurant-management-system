@@ -2,8 +2,17 @@ package com.ubt.restaurant.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
+
+import jakarta.validation.constraints.*;
+
 
 @Entity
 @Table(name = "reservations")
@@ -12,11 +21,14 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank @Size(max = 100)
     @Column(nullable = false)
     private String customerName;
 
+    @NotBlank @Pattern(regexp = "^[+0-9 -]{6,20}$", message = "Telefon i pavlefshem")
     private String phone;
 
+    @NotNull @Future(message = "Data duhet te jete ne te ardhmen")
     @Column(nullable = false)
     private LocalDate reservationDate;
 
@@ -28,6 +40,8 @@ public class Reservation {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private RestaurantTable table;
 
+    @NotNull @Min(value = 1, message = "Minimum 1 person")
+    @Max(value = 20)
     @Column(nullable = false)
     private Integer partySize;
 

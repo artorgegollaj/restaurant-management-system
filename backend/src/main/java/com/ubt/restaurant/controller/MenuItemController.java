@@ -4,7 +4,11 @@ import com.ubt.restaurant.entity.MenuItem;
 import com.ubt.restaurant.repository.MenuCategoryRepository;
 import com.ubt.restaurant.repository.MenuItemRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.*;
+
 
 import java.util.List;
 
@@ -28,8 +32,9 @@ public class MenuItemController {
         return repo.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @PostMapping
-    public MenuItem create(@RequestBody MenuItem m) {
+    public MenuItem create(@Valid @RequestBody MenuItem m) {
         m.setId(null);
         if (m.getCategory() != null && m.getCategory().getId() != null) {
             m.setCategory(categoryRepo.findById(m.getCategory().getId()).orElse(null));
@@ -37,8 +42,9 @@ public class MenuItemController {
         return repo.save(m);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @PutMapping("/{id}")
-    public ResponseEntity<MenuItem> update(@PathVariable Long id, @RequestBody MenuItem m) {
+    public ResponseEntity<MenuItem> update(@PathVariable Long id, @Valid @RequestBody MenuItem m) {
         return repo.findById(id).map(existing -> {
             existing.setName(m.getName());
             existing.setDescription(m.getDescription());
@@ -52,6 +58,7 @@ public class MenuItemController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (!repo.existsById(id)) return ResponseEntity.notFound().build();

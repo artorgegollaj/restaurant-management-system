@@ -3,6 +3,9 @@ package com.ubt.restaurant.controller;
 import com.ubt.restaurant.entity.Reservation;
 import com.ubt.restaurant.repository.ReservationRepository;
 import com.ubt.restaurant.repository.RestaurantTableRepository;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +32,7 @@ public class ReservationController {
     }
 
     @PostMapping
-    public Reservation create(@RequestBody Reservation r) {
+    public Reservation create(@Valid @RequestBody Reservation r) {
         r.setId(null);
         if (r.getTable() != null && r.getTable().getId() != null) {
             r.setTable(tableRepo.findById(r.getTable().getId()).orElse(null));
@@ -38,7 +41,7 @@ public class ReservationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Reservation> update(@PathVariable Long id, @RequestBody Reservation r) {
+    public ResponseEntity<Reservation> update(@PathVariable Long id, @Valid @RequestBody Reservation r) {
         return repo.findById(id).map(existing -> {
             existing.setCustomerName(r.getCustomerName());
             existing.setPhone(r.getPhone());
