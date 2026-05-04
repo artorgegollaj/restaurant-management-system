@@ -33,4 +33,9 @@ public class RefreshToken {
     public void setExpiryDate(Instant expiryDate) { this.expiryDate = expiryDate; }
     public boolean isRevoked() { return revoked; }
     public void setRevoked(boolean revoked) { this.revoked = revoked; }
+
+    public void revokeAllForUser(User user) {
+    var tokens = repo.findByUser(user);
+    tokens.forEach(t -> { t.setRevoked(true); repo.save(t); });
+}
 }

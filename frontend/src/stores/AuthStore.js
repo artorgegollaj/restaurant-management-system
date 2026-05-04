@@ -41,19 +41,16 @@ class AuthStore {
     return this.accessToken;
   }
 
-  async logout() {
+  logout = async () => {
+  if (this.refreshToken) {
     try {
-      if (this.refreshToken) {
-        await axios.post(`${API}/auth/logout`, { refreshToken: this.refreshToken });
-      }
-    } catch (_) {}
-    runInAction(() => {
-      this.accessToken = null;
-      this.refreshToken = null;
-      this.username = null;
-      this.roles = [];
-    });
+      await api.post('/auth/logout', { refreshToken: this.refreshToken });
+    } catch (e) { /* ignore */ }
   }
+  this.accessToken = null;
+  this.refreshToken = null;
+  this.user = null;
+}; 
 }
 
 export const authStore = new AuthStore();

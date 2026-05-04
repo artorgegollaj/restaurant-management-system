@@ -101,10 +101,25 @@ public class AuthController {
                 .orElse(ResponseEntity.status(401).body(Map.of("error", "Invalid refresh token")));
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestBody Map<String, String> body) {
-        String token = body.get("refreshToken");
-        refreshService.findByToken(token).ifPresent(refreshService::revoke);
-        return ResponseEntity.ok(Map.of("message", "Logged out"));
+   @PostMapping("/logout")
+public ResponseEntity<?> logout(@RequestBody Map<String, String> body) {
+    String token = body.get("refreshToken");
+    if (token == null || token.isBlank()) {
+        return ResponseEntity.badRequest().body(Map.of("error", "refreshToken eshte i detyrueshem"));
     }
+    var found = refreshService.findByToken(token);
+    if (found.isEmpty()) {
+        return ResponseEntity.status(404).body(Map.of("error", "Token nuk u gjet"));
+    }
+    refreshService.revoke(found.get());
+    return ResponseEntity.ok(Map.of("message", "Logged out", "revokedAt", java.time.Instant.now().toString()));
+}
+
+@PostMapping("/logout-all")
+public ResponseEntity<?> logoutAll(@RequestBody Map<String, String> body) {
+    String username = body.get("username");
+    var user = userRepo.findByUsername(username).orElseThrow();
+    refreshService.revokeAllForUser(user);
+    return ResponseEntity.ok(Map.of("message", "All sessions logged out for " + username));
+}
 }
