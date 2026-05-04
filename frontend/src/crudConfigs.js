@@ -23,11 +23,7 @@ export const configs = {
       { name: 'name', label: 'Name' },
       { name: 'description', label: 'Description', type: 'textarea' },
       { name: 'price', label: 'Price', type: 'number', step: '0.01' },
-      { name: 'image', label: 'Imazhi', type: 'custom',
-  render: (form, setForm) => (
-    <ImageUpload value={form.image} onChange={(url) => setForm({...form, image: url})} />
-  )
-},
+      { name: 'image', label: 'Image URL' },
       { name: 'available', label: 'Available', type: 'checkbox', default: true }
     ],
     relations: {

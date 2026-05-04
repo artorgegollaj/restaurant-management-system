@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import api from '../api/client.js';
+import api from '../api/http.js';
 import StarRating from '../components/StarRating.jsx';
 
 export default function Reviews() {

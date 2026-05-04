@@ -41,31 +41,7 @@ public class AuthController {
         this.refreshService = refreshService;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody Map<String, String> body) {
-        String username = body.get("username");
-        String email = body.get("email");
-        String password = body.get("password");
-
-        if (userRepo.existsByUsername(username)) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Username already taken"));
-        }
-        if (userRepo.existsByEmail(email)) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Email already used"));
-        }
-
-        Role role = roleRepo.findByName("USER").orElseGet(() -> roleRepo.save(new Role("USER")));
-
-        User user = new User();
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setPassword(encoder.encode(password));
-        user.setRoles(Set.of(role));
-        userRepo.save(user);
-
-        return ResponseEntity.ok(Map.of("message", "User registered"));
-    }
-        public record RegisterRequest(
+    public record RegisterRequest(
         @NotBlank(message = "Username eshte i detyrueshem")
         @Size(min = 3, max = 50, message = "Username 3-50 karaktere")
         String username,
@@ -114,25 +90,6 @@ public class AuthController {
             "username", user.getUsername(),
             "roles", user.getRoles().stream().map(Role::getName).toList()
         ));
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
-        String username = body.get("username");
-        String password = body.get("password");
-
-        authManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-
-        User user = userRepo.findByUsername(username).orElseThrow();
-        String accessToken = jwtService.generateAccessToken(username);
-        RefreshToken refreshToken = refreshService.create(user);
-
-        Map<String, Object> res = new HashMap<>();
-        res.put("accessToken", accessToken);
-        res.put("refreshToken", refreshToken.getToken());
-        res.put("username", user.getUsername());
-        res.put("roles", user.getRoles().stream().map(Role::getName).toList());
-        return ResponseEntity.ok(res);
     }
 
     @PostMapping("/refresh")

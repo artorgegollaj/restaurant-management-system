@@ -12,10 +12,3 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("file:uploads/");
     }
 }
-```
-
-**Lejo endpoint-in pa auth (ose me auth)** ne `SecurityConfig.java`:
-```java
-.requestMatchers("/uploads/**").permitAll()
-.requestMatchers("/api/upload/**").authenticated()
-```
