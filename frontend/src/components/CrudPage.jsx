@@ -196,7 +196,11 @@ function CrudPage({ config }) {
                     <td>{it.id}</td>
                     {fields.map((f) => (
                       <td key={f.name}>
-                        {f.type === 'checkbox' ? (it[f.name] ? 'Yes' : 'No') : String(it[f.name] ?? '')}
+                        {f.render
+                          ? f.render(it)
+                          : f.type === 'checkbox'
+                            ? (it[f.name] ? 'Yes' : 'No')
+                            : String(it[f.name] ?? '')}
                       </td>
                     ))}
                     {Object.entries(relations).map(([key, rel]) => (

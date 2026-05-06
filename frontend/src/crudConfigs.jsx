@@ -1,3 +1,5 @@
+import StatusBadge from './components/StatusBadge.jsx';
+
 export const configs = {
   roles: {
     title: 'Roles',
@@ -41,7 +43,7 @@ export const configs = {
     fields: [
       { name: 'tableNumber', label: 'Table Number', type: 'number' },
       { name: 'capacity', label: 'Capacity', type: 'number' },
-      { name: 'status', label: 'Status', default: 'FREE' }
+      { name: 'status', label: 'Status', default: 'FREE', render: (r) => <StatusBadge status={r.status} /> }
     ]
   },
 
@@ -54,7 +56,7 @@ export const configs = {
       { name: 'reservationDate', label: 'Date', type: 'date' },
       { name: 'reservationTime', label: 'Time', type: 'time' },
       { name: 'partySize', label: 'Party Size', type: 'number' },
-      { name: 'status', label: 'Status', default: 'PENDING' }
+      { name: 'status', label: 'Status', default: 'PENDING', render: (r) => <StatusBadge status={r.status} /> }
     ],
     relations: {
       table: { label: 'Table', endpoint: '/tables', display: (t) => `#${t.tableNumber}` }
@@ -65,7 +67,7 @@ export const configs = {
     title: 'Orders',
     endpoint: '/orders',
     fields: [
-      { name: 'status', label: 'Status', default: 'PENDING' },
+      { name: 'status', label: 'Status', default: 'PENDING', render: (r) => <StatusBadge status={r.status} /> },
       { name: 'total', label: 'Total', type: 'number', step: '0.01' },
       { name: 'orderType', label: 'Order Type', default: 'DINE_IN' }
     ],
