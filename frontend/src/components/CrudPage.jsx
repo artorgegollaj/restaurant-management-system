@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import http from '../api/http';
+import TableSkeleton from './TableSkeleton.jsx';
 
 function emptyForm(fields) {
   const o = {};
@@ -19,10 +20,16 @@ function CrudPage({ config }) {
   const [editingId, setEditingId] = useState(null);
   const [relData, setRelData] = useState({});
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const load = async () => {
-    const r = await http.get(endpoint);
-    setItems(r.data);
+    setLoading(true);
+    try {
+      const r = await http.get(endpoint);
+      setItems(r.data);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -168,38 +175,42 @@ function CrudPage({ config }) {
 
       <div className="card shadow-sm">
         <div className="table-responsive">
-          <table className="table table-hover mb-0">
-            <thead className="table-light">
-              <tr>
-                <th>ID</th>
-                {fields.map((f) => (<th key={f.name}>{f.label}</th>))}
-                {Object.entries(relations).map(([key, rel]) => (<th key={key}>{rel.label}</th>))}
-                <th className="text-end">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.length === 0 && (
-                <tr><td colSpan={fields.length + 2 + Object.keys(relations).length} className="text-muted text-center">No records</td></tr>
-              )}
-              {items.map((it) => (
-                <tr key={it.id}>
-                  <td>{it.id}</td>
-                  {fields.map((f) => (
-                    <td key={f.name}>
-                      {f.type === 'checkbox' ? (it[f.name] ? 'Yes' : 'No') : String(it[f.name] ?? '')}
-                    </td>
-                  ))}
-                  {Object.entries(relations).map(([key, rel]) => (
-                    <td key={key}>{it[key] ? rel.display(it[key]) : '-'}</td>
-                  ))}
-                  <td className="text-end">
-                    <button className="btn btn-sm btn-outline-primary me-2" onClick={() => edit(it)}>Edit</button>
-                    <button className="btn btn-sm btn-outline-danger" onClick={() => remove(it.id)}>Delete</button>
-                  </td>
+          {loading ? (
+            <TableSkeleton rows={6} cols={fields.length + 2 + Object.keys(relations).length} />
+          ) : (
+            <table className="table table-hover mb-0">
+              <thead className="table-light">
+                <tr>
+                  <th>ID</th>
+                  {fields.map((f) => (<th key={f.name}>{f.label}</th>))}
+                  {Object.entries(relations).map(([key, rel]) => (<th key={key}>{rel.label}</th>))}
+                  <th className="text-end">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {items.length === 0 && (
+                  <tr><td colSpan={fields.length + 2 + Object.keys(relations).length} className="text-muted text-center">No records</td></tr>
+                )}
+                {items.map((it) => (
+                  <tr key={it.id}>
+                    <td>{it.id}</td>
+                    {fields.map((f) => (
+                      <td key={f.name}>
+                        {f.type === 'checkbox' ? (it[f.name] ? 'Yes' : 'No') : String(it[f.name] ?? '')}
+                      </td>
+                    ))}
+                    {Object.entries(relations).map(([key, rel]) => (
+                      <td key={key}>{it[key] ? rel.display(it[key]) : '-'}</td>
+                    ))}
+                    <td className="text-end">
+                      <button className="btn btn-sm btn-outline-primary me-2" onClick={() => edit(it)}>Edit</button>
+                      <button className="btn btn-sm btn-outline-danger" onClick={() => remove(it.id)}>Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>
