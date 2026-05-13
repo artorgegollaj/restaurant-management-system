@@ -1,15 +1,20 @@
 package com.ubt.restaurant.repository;
 
-import com.ubt.restaurant.entity.RefreshToken;
-import com.ubt.restaurant.entity.User;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.Optional;
+
+import com.ubt.restaurant.entity.RefreshToken;
+import com.ubt.restaurant.entity.User;
 
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
     Optional<RefreshToken> findByToken(String token);
+
+    List<RefreshToken> findByUser(User user);
 
     @Modifying
     @Transactional
@@ -17,4 +22,3 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     void revokeAllByUser(User user);
 } 
 
-List<RefreshToken> findByUser(User user);

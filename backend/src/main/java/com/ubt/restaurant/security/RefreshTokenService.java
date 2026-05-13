@@ -1,14 +1,15 @@
 package com.ubt.restaurant.security;
 
-import com.ubt.restaurant.entity.RefreshToken;
-import com.ubt.restaurant.entity.User;
-import com.ubt.restaurant.repository.RefreshTokenRepository;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import com.ubt.restaurant.entity.RefreshToken;
+import com.ubt.restaurant.entity.User;
+import com.ubt.restaurant.repository.RefreshTokenRepository;
 
 @Service
 public class RefreshTokenService {
@@ -44,7 +45,9 @@ public class RefreshTokenService {
         repo.save(rt);
     }
 
-    public void revokeAll(User user) {
+  
+    public void revokeAllForUser(User user) {
         repo.revokeAllByUser(user);
     }
+
 }
