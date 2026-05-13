@@ -7,7 +7,7 @@ import Layout from './components/Layout.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Users from './pages/Users.jsx';
 import CrudPage from './components/CrudPage.jsx';
-import { configs } from './crudConfigs.js';
+import { configs } from './crudConfigs.jsx';
 import Reviews from './pages/Reviews.jsx';
 
 const Protected = observer(({ children }) => {
