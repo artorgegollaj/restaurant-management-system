@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import api from '../api/client.js';
+import api from '../api/http.js';
 
 export default function ImageUpload({ value, onChange }) {
   const [uploading, setUploading] = useState(false);

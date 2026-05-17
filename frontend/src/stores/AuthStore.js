@@ -42,15 +42,18 @@ class AuthStore {
   }
 
   logout = async () => {
-  if (this.refreshToken) {
-    try {
-      await api.post('/auth/logout', { refreshToken: this.refreshToken });
-    } catch (e) { /* ignore */ }
-  }
-  this.accessToken = null;
-  this.refreshToken = null;
-  this.user = null;
-}; 
+    if (this.refreshToken) {
+      try {
+        await axios.post(`${API}/auth/logout`, { refreshToken: this.refreshToken });
+      } catch (e) { /* ignore */ }
+    }
+    runInAction(() => {
+      this.accessToken = null;
+      this.refreshToken = null;
+      this.username = null;
+      this.roles = [];
+    });
+  };
 }
 
 export const authStore = new AuthStore();
