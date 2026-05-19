@@ -1,0 +1,9 @@
+$kind: http-request
+url: ""
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: '{"tableNumber":11,"capacity":6,"status":"FREE"}'
+order: 2000

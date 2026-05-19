@@ -1,0 +1,9 @@
+$kind: http-request
+url: ""
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: '{"order":{"id":1},"amount":11.50,"method":"Cash"}'
+order: 2000

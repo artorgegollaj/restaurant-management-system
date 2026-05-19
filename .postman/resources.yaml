@@ -1,0 +1,11 @@
+# Use this workspace to collaborate
+workspace:
+  id: 84c9caa3-3f89-47fe-8dac-9b8a38b0fa39
+
+localResources:
+  collections:
+    - ..\team-tasks\restaurant-api.postman_collection.json
+
+cloudResources:
+  collections:
+    ..\postman\collections\Restaurant Management API: 0b1b7f76-d9ad-4749-9768-643f9ae05a75

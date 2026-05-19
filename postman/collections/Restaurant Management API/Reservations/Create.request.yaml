@@ -1,0 +1,9 @@
+$kind: http-request
+url: ""
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: '{"customerName":"Auron","phone":"+38344111222","reservationDate":"2026-05-20","reservationTime":"19:00","tableId":1,"partySize":4,"status":"PENDING"}'
+order: 2000
