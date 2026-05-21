@@ -159,6 +159,61 @@
       "item": [
         { "name":"Daily sales", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/dashboard/daily-sales?from=2026-01-01&to=2026-12-31" } } }
       ]
+    },
+    {
+      "name": "Delivery",
+      "item": [
+        {
+          "name": "List deliveries",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/deliveries" }
+          }
+        },
+        {
+          "name": "Create delivery",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": 1,\n  \"customerName\": \"Yll N.\",\n  \"customerPhone\": \"+38344123456\",\n  \"address\": \"Rr. Rexhep Mala 12, Prishtine\",\n  \"deliveryFee\": 2.50,\n  \"notes\": \"Kati 3\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/deliveries" }
+          }
+        },
+        {
+          "name": "Assign courier",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courierName\": \"Drion G.\",\n  \"courierPhone\": \"+38344999000\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/deliveries/1/assign-courier" }
+          }
+        },
+        {
+          "name": "Update status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"status\": \"OUT_FOR_DELIVERY\" }" },
+            "url": { "raw": "{{baseUrl}}/deliveries/1/status" }
+          }
+        }
+      ]
     }
   ]
 }

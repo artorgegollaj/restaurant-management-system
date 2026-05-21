@@ -2,6 +2,7 @@ package com.ubt.restaurant.controller;
 
 import com.ubt.restaurant.repository.OrderItemRepository;
 import com.ubt.restaurant.repository.OrderRepository;
+import com.ubt.restaurant.repository.DeliveryRepository;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +20,12 @@ public class DashboardController {
 
     private final OrderRepository orderRepo;
     private final OrderItemRepository itemRepo;
+    private final DeliveryRepository deliveryRepo;
 
-    public DashboardController(OrderRepository orderRepo, OrderItemRepository itemRepo) {
+    public DashboardController(OrderRepository orderRepo, OrderItemRepository itemRepo, DeliveryRepository deliveryRepo) {
         this.orderRepo = orderRepo;
         this.itemRepo = itemRepo;
+        this.deliveryRepo = deliveryRepo;
     }
 
     public record DailySale(LocalDate date, long count, BigDecimal total) {}
@@ -30,6 +33,8 @@ public class DashboardController {
     public record DashboardSummary(
         long totalOrders, BigDecimal totalRevenue, long pendingOrders,
         long todayOrders, BigDecimal todayRevenue) {}
+
+    public record DeliveryStats(long pending, long inTransit, long deliveredToday) {}
 
     @GetMapping("/daily-sales")
     public List<DailySale> dailySales(
@@ -66,7 +71,7 @@ public class DashboardController {
 
     @GetMapping("/top-products")
     public List<TopProduct> topProducts(@RequestParam(defaultValue = "5") int limit) {
-        Map<String, long[]> agg = new HashMap<>();   // [qty, revenueScaled]
+        Map<String, long[]> agg = new HashMap<>();
         for (var oi : itemRepo.findAll()) {
             String name = oi.getMenuItem().getName();
             long[] cur = agg.getOrDefault(name, new long[]{0L, 0L});
@@ -115,5 +120,23 @@ public class DashboardController {
         res.put("total", total);
         res.put("orders", orders);
         return res;
+    }
+
+    @GetMapping("/delivery-stats")
+    public DeliveryStats deliveryStats() {
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+        long pending = deliveryRepo.countByStatus("PENDING");
+
+        long inTransit =
+                deliveryRepo.countByStatus("OUT_FOR_DELIVERY") +
+                deliveryRepo.countByStatus("ASSIGNED");
+
+        long deliveredToday = deliveryRepo.countByStatusAndCreatedAtBetween(
+                "DELIVERED", startOfDay, endOfDay
+        );
+
+        return new DeliveryStats(pending, inTransit, deliveredToday);
     }
 }
