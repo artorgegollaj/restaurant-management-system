@@ -13,6 +13,7 @@ export default function Dashboard() {
   const [summary, setSummary] = useState(null);
   const [daily, setDaily] = useState([]);
   const [top, setTop] = useState([]);
+  const [deliveryStats, setDeliveryStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,10 +21,12 @@ export default function Dashboard() {
       api.get('/dashboard/summary'),
       api.get('/dashboard/daily-sales'),
       api.get('/dashboard/top-products?limit=5'),
-    ]).then(([s, d, t]) => {
+      api.get('/dashboard/delivery-stats'),
+    ]).then(([s, d, t, ds]) => {
       setSummary(s.data);
       setDaily(d.data);
       setTop(t.data);
+      setDeliveryStats(ds.data);
     }).finally(() => setLoading(false));
   }, []);
 
@@ -67,6 +70,23 @@ export default function Dashboard() {
         <div className="col-md-3"><StatCard label="Ne Pritje" value={summary?.pendingOrders ?? 0} icon="bi-clock-history" color="warning" /></div>
         <div className="col-md-3"><StatCard label="Sot" value={`${summary?.todayOrders ?? 0} (${(summary?.todayRevenue ?? 0).toFixed(2)}€)`} icon="bi-calendar-check" color="info" /></div>
       </div>
+
+      {deliveryStats && (
+        <div className="row mb-4">
+          <div className="col-md-4">
+            <StatCard icon="bi-hourglass-split" color="warning"
+              label="Dergesa Pezull" value={deliveryStats.pending} />
+          </div>
+          <div className="col-md-4">
+            <StatCard icon="bi-truck" color="primary"
+              label="Ne Rruge" value={deliveryStats.inTransit} />
+          </div>
+          <div className="col-md-4">
+            <StatCard icon="bi-check-circle" color="success"
+              label="Dorezuar Sot" value={deliveryStats.deliveredToday} />
+          </div>
+        </div>
+      )}
 
       <div className="row g-3 mb-4">
         <div className="col-md-8">

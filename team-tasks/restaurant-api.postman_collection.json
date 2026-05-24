@@ -1,0 +1,219 @@
+{
+  "info": {
+    "name": "Restaurant Management API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api" },
+    { "key": "accessToken", "value": "" },
+    { "key": "refreshToken", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/auth/register" },
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode":"raw","raw":"{\"username\":\"testuser\",\"email\":\"test@example.com\",\"password\":\"password123\"}" }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('accessToken', json.accessToken);",
+              "pm.collectionVariables.set('refreshToken', json.refreshToken);"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/auth/login" },
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode":"raw","raw":"{\"username\":\"admin\",\"password\":\"Admin@12345\"}" }
+          }
+        },
+        {
+          "name": "Refresh",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/auth/refresh" },
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode":"raw","raw":"{\"refreshToken\":\"{{refreshToken}}\"}" }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/auth/logout" },
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode":"raw","raw":"{\"refreshToken\":\"{{refreshToken}}\"}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Menu Items",
+      "auth": { "type": "bearer", "bearer": [{"key":"token","value":"{{accessToken}}"}] },
+      "item": [
+        {
+          "name": "List",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/menu-items" } }
+        },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/menu-items" },
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode":"raw","raw":"{\"name\":\"Burger\",\"price\":4.50,\"available\":true,\"category\":{\"id\":1}}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "auth": { "type": "bearer", "bearer": [{"key":"token","value":"{{accessToken}}"}] },
+      "item": [
+        {
+          "name": "List",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/orders" } }
+        },
+        {
+          "name": "Create with items",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/orders" },
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode":"raw","raw":"{\"tableId\":1,\"orderType\":\"DINE_IN\",\"items\":[{\"menuItemId\":1,\"quantity\":2,\"notes\":\"Pa qepe\"}]}" }
+          }
+        },
+        {
+          "name": "Update status",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/orders/1/status" },
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode":"raw","raw":"{\"status\":\"IN_PROGRESS\"}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tables",
+      "auth": { "type": "bearer", "bearer": [{"key":"token","value":"{{accessToken}}"}] },
+      "item": [
+        { "name":"List", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/tables" } } },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/tables" },
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode":"raw","raw":"{\"tableNumber\":11,\"capacity\":6,\"status\":\"FREE\"}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reservations",
+      "auth": { "type": "bearer", "bearer": [{"key":"token","value":"{{accessToken}}"}] },
+      "item": [
+        { "name":"List", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/reservations" } } },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/reservations" },
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode":"raw","raw":"{\"customerName\":\"Auron\",\"phone\":\"+38344111222\",\"reservationDate\":\"2026-05-20\",\"reservationTime\":\"19:00\",\"tableId\":1,\"partySize\":4,\"status\":\"PENDING\"}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "auth": { "type": "bearer", "bearer": [{"key":"token","value":"{{accessToken}}"}] },
+      "item": [
+        { "name":"List", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/payments" } } },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/payments" },
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode":"raw","raw":"{\"order\":{\"id\":1},\"amount\":11.50,\"method\":\"Cash\"}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "auth": { "type": "bearer", "bearer": [{"key":"token","value":"{{accessToken}}"}] },
+      "item": [
+        { "name":"Daily sales", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/dashboard/daily-sales?from=2026-01-01&to=2026-12-31" } } }
+      ]
+    },
+    {
+      "name": "Delivery",
+      "item": [
+        {
+          "name": "List deliveries",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/deliveries" }
+          }
+        },
+        {
+          "name": "Create delivery",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": 1,\n  \"customerName\": \"Yll N.\",\n  \"customerPhone\": \"+38344123456\",\n  \"address\": \"Rr. Rexhep Mala 12, Prishtine\",\n  \"deliveryFee\": 2.50,\n  \"notes\": \"Kati 3\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/deliveries" }
+          }
+        },
+        {
+          "name": "Assign courier",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courierName\": \"Drion G.\",\n  \"courierPhone\": \"+38344999000\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/deliveries/1/assign-courier" }
+          }
+        },
+        {
+          "name": "Update status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"status\": \"OUT_FOR_DELIVERY\" }" },
+            "url": { "raw": "{{baseUrl}}/deliveries/1/status" }
+          }
+        }
+      ]
+    }
+  ]
+}

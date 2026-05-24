@@ -1,0 +1,9 @@
+$kind: http-request
+url: ""
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: '{"name":"Burger","price":4.50,"available":true,"category":{"id":1}}'
+order: 2000

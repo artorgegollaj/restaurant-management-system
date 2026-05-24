@@ -1,0 +1,9 @@
+$kind: http-request
+url: ""
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: '{"tableId":1,"orderType":"DINE_IN","items":[{"menuItemId":1,"quantity":2,"notes":"Pa qepe"}]}'
+order: 2000
