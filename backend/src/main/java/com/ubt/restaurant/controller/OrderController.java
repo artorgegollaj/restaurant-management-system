@@ -7,6 +7,8 @@ import com.ubt.restaurant.repository.MenuItemRepository;
 import com.ubt.restaurant.repository.OrderItemRepository;
 import com.ubt.restaurant.repository.OrderRepository;
 import com.ubt.restaurant.repository.RestaurantTableRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@Tag(name = "Orders", description = "Menaxhimi i porosive")
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
@@ -49,6 +52,7 @@ public class OrderController {
     public record OrderItemRequest(Long menuItemId, Integer quantity, String notes) {}
     public record OrderRequest(Long tableId, String orderType, String status, List<OrderItemRequest> items) {}
 
+    @Operation(summary = "Liston te gjitha porosite")
     @GetMapping
     public List<OrderEntity> getAll() { return orderRepo.findAll(); }
 
@@ -57,6 +61,7 @@ public class OrderController {
         return orderRepo.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
+    @Operation(summary = "Krijon nje porosi te re me artikuj")
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'WAITER')")
     @PostMapping
     public OrderEntity create(@RequestBody OrderRequest req) {
