@@ -96,3 +96,58 @@ Orders also expose `PATCH /api/orders/{id}/status` for order status transitions
 - Trello: tasks broken down per entity / feature.
 - Live coding: be able to explain every file, add a new CRUD field on the fly.
 - Dashboard: daily sales, monthly sales, top-selling items, date-filtered sales report.
+
+## Arkitektura
+
+```
+┌─────────────────┐      HTTPS/JSON      ┌──────────────────┐
+│  React + Vite   │  ──────────────────▶ │  Spring Boot 3   │
+│  (port 5173)    │  ◀────── JWT  ─────  │  (port 8080)     │
+└─────────────────┘                      └────────┬─────────┘
+                                                  │ JPA
+                                         ┌────────▼─────────┐
+                                         │   MSSQL Server   │
+                                         │ RestaurantDB     │
+                                         └──────────────────┘
+```
+
+### Stack
+- **Backend:** Spring Boot 3.2.5, Java 17, Spring Security + JWT, Spring Data JPA, MSSQL
+- **Frontend:** React 18, Vite, Bootstrap 5, Axios, MobX (in-memory token), React Router
+- **Auth:** JWT access token (15 min) + Refresh token (7 dite) i ruajtur ne DB me revoke
+
+## Diagrami i Entiteteve
+
+```
+User ──< UserRoles >── Role
+  │                      │
+  └─< RefreshToken       └─< UserClaim
+  └─< UserToken
+
+MenuCategory ──< MenuItem ──< OrderItem >── OrderEntity ──> RestaurantTable
+                  │                            │
+                  └─< Ingredient               └─< Payment
+                                               └── Reservation
+                                               └── Review
+
+Staff ─── User
+```
+
+### Endpoint-et kryesore
+| Metoda | URL | Pershkrim |
+|--------|-----|-----------|
+| POST | /api/auth/register | Regjistrim |
+| POST | /api/auth/login | Login + JWT |
+| POST | /api/auth/refresh | Rinovim token |
+| POST | /api/auth/logout | Revoke refresh |
+| GET/POST/PUT/DELETE | /api/menu-items | CRUD meny |
+| GET/POST/PUT/DELETE | /api/orders | CRUD porosi |
+| PATCH | /api/orders/{id}/status | Ndrysho status |
+| GET | /api/dashboard/daily-sales | Statistika |
+
+## Setup Lokal
+
+1. **DB:** `sqlcmd -S localhost -i database/schema.sql`
+2. **BE:** `cd backend && mvn spring-boot:run`
+3. **FE:** `cd frontend && npm install && npm run dev`
+4. Hap http://localhost:5173 — login `admin` / `Admin@12345`
