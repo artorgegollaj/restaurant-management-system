@@ -23,35 +23,68 @@ const Login = observer(() => {
     if (!validate()) return;
     try {
       await authStore.login(values.username, values.password);
-      navigate('/');
+      const roles = authStore.roles;
+      const isUserOnly = roles.length > 0 && roles.every(r => r === 'USER');
+      navigate(isUserOnly ? '/home' : '/');
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed');
     }
   };
 
   return (
-    <div className="d-flex align-items-center justify-content-center vh-100 bg-light">
-      <form onSubmit={submit} noValidate className="card p-4 shadow" style={{ width: 360 }}>
-        <h4 className="mb-3 text-center">Restaurant Login</h4>
-        {error && <div className="alert alert-danger py-2">{error}</div>}
-        <FormField
-          label="Username"
-          value={values.username}
-          onChange={(v) => setField('username', v)}
-          error={errors.username}
-          required
-        />
-        <FormField
-          label="Password"
-          type="password"
-          value={values.password}
-          onChange={(v) => setField('password', v)}
-          error={errors.password}
-          required
-        />
-        <button type="submit" className="btn btn-primary w-100">Login</button>
+    <div
+      className="d-flex align-items-center justify-content-center vh-100"
+      style={{ background: '#0d0d0d' }}
+    >
+      <form
+        onSubmit={submit}
+        noValidate
+        className="card p-4 shadow-lg border-0"
+        style={{ width: 360, background: '#1a1a1a', borderTop: '3px solid #ff6600' }}
+      >
+        <div className="text-center mb-4">
+          <i className="bi bi-fire fs-1" style={{ color: '#ff6600' }}></i>
+          <h4 className="fw-bold text-white mt-2" style={{ letterSpacing: 3 }}>AURA</h4>
+          <p className="small mb-0" style={{ color: 'rgba(255,255,255,0.5)' }}>Sign in to your account</p>
+        </div>
+
+        {error && <div className="alert alert-danger py-2 small">{error}</div>}
+
+        <div className="mb-3">
+          <label className="form-label text-white-50 small fw-semibold">Username</label>
+          <FormField
+            value={values.username}
+            onChange={(v) => setField('username', v)}
+            error={errors.username}
+            required
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="form-label text-white-50 small fw-semibold">Password</label>
+          <FormField
+            type="password"
+            value={values.password}
+            onChange={(v) => setField('password', v)}
+            error={errors.password}
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="btn w-100 fw-semibold py-2 rounded-3"
+          style={{ background: '#ff6600', color: '#fff', border: 'none' }}
+          onMouseEnter={e => e.currentTarget.style.background = '#e55a00'}
+          onMouseLeave={e => e.currentTarget.style.background = '#ff6600'}
+        >
+          Login
+        </button>
+
         <div className="text-center mt-3">
-          <Link to="/register">Register</Link>
+          <Link to="/register" style={{ color: '#ff6600', fontSize: '0.875rem' }}>
+            Don't have an account? Register
+          </Link>
         </div>
       </form>
     </div>

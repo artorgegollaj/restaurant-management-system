@@ -28,8 +28,8 @@ const Layout = observer(() => {
 
   return (
     <div className="d-flex" style={{ minHeight: '100vh' }}>
-      <aside className="bg-dark text-white p-3" style={{ width: 230 }}>
-        <h5 className="mb-4">🍽 Restaurant</h5>
+      <aside className="text-white p-3" style={{ width: 230, background: '#111111' }}>
+        <h5 className="mb-4 fw-bold" style={{ color: '#ff6600', letterSpacing: 2 }}>AURA</h5>
         <nav className="nav flex-column">
           {links.map((l) => (
             <NavLink
@@ -37,8 +37,9 @@ const Layout = observer(() => {
               to={l.to}
               end={l.end}
               className={({ isActive }) =>
-                'nav-link text-white ' + (isActive ? 'fw-bold bg-secondary rounded' : '')
+                'nav-link text-white ' + (isActive ? 'fw-bold rounded' : '')
               }
+              style={({ isActive }) => isActive ? { background: 'rgba(255,102,0,0.25)', color: '#ff6600' } : {}}
             >
               {l.label}
             </NavLink>

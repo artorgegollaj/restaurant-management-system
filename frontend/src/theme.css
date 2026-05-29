@@ -1,0 +1,50 @@
+:root {
+  --bs-warning: #ff6600;
+  --bs-warning-rgb: 255, 102, 0;
+}
+
+.btn-warning {
+  --bs-btn-bg: #ff6600;
+  --bs-btn-border-color: #ff6600;
+  --bs-btn-hover-bg: #e55a00;
+  --bs-btn-hover-border-color: #e55a00;
+  --bs-btn-active-bg: #cc5200;
+  --bs-btn-active-border-color: #cc5200;
+  --bs-btn-disabled-bg: #ff6600;
+  --bs-btn-disabled-border-color: #ff6600;
+  color: #fff !important;
+}
+
+.btn-outline-warning {
+  --bs-btn-color: #ff6600;
+  --bs-btn-border-color: #ff6600;
+  --bs-btn-hover-bg: #ff6600;
+  --bs-btn-hover-border-color: #ff6600;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-active-bg: #e55a00;
+  --bs-btn-active-border-color: #e55a00;
+  color: #ff6600;
+}
+
+.text-warning {
+  color: #ff6600 !important;
+}
+
+.bg-warning {
+  background-color: #ff6600 !important;
+}
+
+.badge.bg-warning {
+  background-color: #ff6600 !important;
+  color: #fff !important;
+}
+
+.spinner-border.text-warning,
+.spinner-grow.text-warning {
+  color: #ff6600 !important;
+}
+
+.bi.text-warning,
+i.text-warning {
+  color: #ff6600 !important;
+}
