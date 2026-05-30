@@ -9,9 +9,20 @@ import Users from './pages/Users.jsx';
 import CrudPage from './components/CrudPage.jsx';
 import { configs } from './crudConfigs.jsx';
 import Reviews from './pages/Reviews.jsx';
+import HomePage from './pages/user/HomePage.jsx';
 
+// Redirects to /login if not authenticated
 const Protected = observer(({ children }) => {
   return authStore.isAuthenticated ? children : <Navigate to="/login" replace />;
+});
+
+// Accessible only to USER-only accounts; staff/admin get bounced to /
+const UserPortal = observer(({ children }) => {
+  if (!authStore.isAuthenticated) return <Navigate to="/login" replace />;
+  const roles = authStore.roles;
+  const isUserOnly = roles.length > 0 && roles.every(r => r === 'USER');
+  if (!isUserOnly) return <Navigate to="/" replace />;
+  return children;
 });
 
 function App() {
@@ -19,6 +30,18 @@ function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+
+      {/* Customer portal — USER role only */}
+      <Route
+        path="/home"
+        element={
+          <UserPortal>
+            <HomePage />
+          </UserPortal>
+        }
+      />
+
+      {/* Staff / admin dashboard */}
       <Route
         path="/"
         element={

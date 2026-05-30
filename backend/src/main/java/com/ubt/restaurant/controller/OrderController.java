@@ -62,7 +62,7 @@ public class OrderController {
     }
 
     @Operation(summary = "Krijon nje porosi te re me artikuj")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'WAITER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'WAITER', 'USER')")
     @PostMapping
     public OrderEntity create(@RequestBody OrderRequest req) {
         if (req.items() == null || req.items().isEmpty()) {

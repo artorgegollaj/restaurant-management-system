@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction } from 'mobx';
+import { makeAutoObservable, runInAction, autorun } from 'mobx';
 import axios from 'axios';
 
 const API = 'http://localhost:8080/api';
@@ -11,6 +11,28 @@ class AuthStore {
 
   constructor() {
     makeAutoObservable(this);
+    try {
+      const saved = localStorage.getItem('auth');
+      if (saved) {
+        const data = JSON.parse(saved);
+        this.accessToken = data.accessToken || null;
+        this.refreshToken = data.refreshToken || null;
+        this.username = data.username || null;
+        this.roles = data.roles || [];
+      }
+    } catch {}
+    autorun(() => {
+      if (this.accessToken || this.refreshToken) {
+        localStorage.setItem('auth', JSON.stringify({
+          accessToken: this.accessToken,
+          refreshToken: this.refreshToken,
+          username: this.username,
+          roles: this.roles,
+        }));
+      } else {
+        localStorage.removeItem('auth');
+      }
+    });
   }
 
   get isAuthenticated() {

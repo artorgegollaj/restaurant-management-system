@@ -1,4 +1,15 @@
 import StatusBadge from './components/StatusBadge.jsx';
+import http from './api/http.js';
+
+const ORDER_TRANSITIONS = {
+  PENDING:     ['IN_PROGRESS', 'CANCELLED'],
+  IN_PROGRESS: ['DELIVERED',   'CANCELLED'],
+  DELIVERED:   ['PAID',        'CANCELLED'],
+  PAID:        [],
+  CANCELLED:   [],
+};
+const ORDER_STATUS_LABELS   = { IN_PROGRESS: 'Start', DELIVERED: 'Deliver', PAID: 'Mark Paid', CANCELLED: 'Cancel' };
+const ORDER_STATUS_VARIANTS = { IN_PROGRESS: 'btn-outline-info', DELIVERED: 'btn-outline-primary', PAID: 'btn-outline-success', CANCELLED: 'btn-outline-danger' };
 
 export const configs = {
   roles: {
@@ -73,7 +84,16 @@ export const configs = {
     ],
     relations: {
       table: { label: 'Table', endpoint: '/tables', display: (t) => `#${t.tableNumber}` }
-    }
+    },
+    customActions: (order, reload) => (ORDER_TRANSITIONS[order.status] || []).map((next) => (
+      <button
+        key={next}
+        className={`btn btn-sm ${ORDER_STATUS_VARIANTS[next]} me-1`}
+        onClick={async () => { await http.patch(`/orders/${order.id}/status`, { status: next }); reload(); }}
+      >
+        {ORDER_STATUS_LABELS[next]}
+      </button>
+    )),
   },
 
   orderItems: {

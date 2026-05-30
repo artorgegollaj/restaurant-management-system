@@ -207,6 +207,7 @@ function CrudPage({ config }) {
                       <td key={key}>{it[key] ? rel.display(it[key]) : '-'}</td>
                     ))}
                     <td className="text-end">
+                      {config.customActions && config.customActions(it, load)}
                       <button className="btn btn-sm btn-outline-primary me-2" onClick={() => edit(it)}>Edit</button>
                       <button className="btn btn-sm btn-outline-danger" onClick={() => remove(it.id)}>Delete</button>
                     </td>
