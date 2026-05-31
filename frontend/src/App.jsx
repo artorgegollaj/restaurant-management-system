@@ -8,21 +8,26 @@ import Dashboard from './pages/Dashboard.jsx';
 import Users from './pages/Users.jsx';
 import CrudPage from './components/CrudPage.jsx';
 import { configs } from './crudConfigs.jsx';
-import Reviews from './pages/Reviews.jsx';
 import HomePage from './pages/user/HomePage.jsx';
+import { canAccess, isUserOnly, landingPath } from './auth/permissions.js';
 
-// Redirects to /login if not authenticated
-const Protected = observer(({ children }) => {
-  return authStore.isAuthenticated ? children : <Navigate to="/login" replace />;
-});
-
-// Accessible only to USER-only accounts; staff/admin get bounced to /
+// Customer portal — USER-only accounts; staff/admin get sent to their landing page
 const UserPortal = observer(({ children }) => {
   if (!authStore.isAuthenticated) return <Navigate to="/login" replace />;
-  const roles = authStore.roles;
-  const isUserOnly = roles.length > 0 && roles.every(r => r === 'USER');
-  if (!isUserOnly) return <Navigate to="/" replace />;
+  if (!isUserOnly(authStore.roles)) return <Navigate to={landingPath(authStore.roles)} replace />;
   return children;
+});
+
+// Staff area — any logged-in non-customer; customers are sent to /home
+const RequireStaff = observer(({ children }) => {
+  if (!authStore.isAuthenticated) return <Navigate to="/login" replace />;
+  if (isUserOnly(authStore.roles)) return <Navigate to="/home" replace />;
+  return children;
+});
+
+// Per-page role check; bounce to the role's landing page if not allowed
+const Guard = observer(({ path, children }) => {
+  return canAccess(path, authStore.roles) ? children : <Navigate to={landingPath(authStore.roles)} replace />;
 });
 
 function App() {
@@ -32,38 +37,23 @@ function App() {
       <Route path="/register" element={<Register />} />
 
       {/* Customer portal — USER role only */}
-      <Route
-        path="/home"
-        element={
-          <UserPortal>
-            <HomePage />
-          </UserPortal>
-        }
-      />
+      <Route path="/home" element={<UserPortal><HomePage /></UserPortal>} />
 
       {/* Staff / admin dashboard */}
-      <Route
-        path="/"
-        element={
-          <Protected>
-            <Layout />
-          </Protected>
-        }
-      >
-        <Route index element={<Dashboard />} />
-        <Route path="users" element={<Users />} />
-        <Route path="roles" element={<CrudPage config={configs.roles} />} />
-        <Route path="menu-categories" element={<CrudPage config={configs.menuCategories} />} />
-        <Route path="menu-items" element={<CrudPage config={configs.menuItems} />} />
-        <Route path="tables" element={<CrudPage config={configs.tables} />} />
-        <Route path="reservations" element={<CrudPage config={configs.reservations} />} />
-        <Route path="orders" element={<CrudPage config={configs.orders} />} />
-        <Route path="order-items" element={<CrudPage config={configs.orderItems} />} />
-        <Route path="staff" element={<CrudPage config={configs.staff} />} />
-        <Route path="payments" element={<CrudPage config={configs.payments} />} />
-        <Route path="reviews" element={<CrudPage config={configs.reviews} />} />
-        <Route path="/reviews" element={<Reviews />} />
-        <Route path="ingredients" element={<CrudPage config={configs.ingredients} />} />
+      <Route path="/" element={<RequireStaff><Layout /></RequireStaff>}>
+        <Route index element={<Guard path="/"><Dashboard /></Guard>} />
+        <Route path="users" element={<Guard path="/users"><Users /></Guard>} />
+        <Route path="roles" element={<Guard path="/roles"><CrudPage config={configs.roles} /></Guard>} />
+        <Route path="menu-categories" element={<Guard path="/menu-categories"><CrudPage config={configs.menuCategories} /></Guard>} />
+        <Route path="menu-items" element={<Guard path="/menu-items"><CrudPage config={configs.menuItems} /></Guard>} />
+        <Route path="tables" element={<Guard path="/tables"><CrudPage config={configs.tables} /></Guard>} />
+        <Route path="reservations" element={<Guard path="/reservations"><CrudPage config={configs.reservations} /></Guard>} />
+        <Route path="orders" element={<Guard path="/orders"><CrudPage config={configs.orders} /></Guard>} />
+        <Route path="order-items" element={<Guard path="/order-items"><CrudPage config={configs.orderItems} /></Guard>} />
+        <Route path="staff" element={<Guard path="/staff"><CrudPage config={configs.staff} /></Guard>} />
+        <Route path="payments" element={<Guard path="/payments"><CrudPage config={configs.payments} /></Guard>} />
+        <Route path="reviews" element={<Guard path="/reviews"><CrudPage config={configs.reviews} /></Guard>} />
+        <Route path="ingredients" element={<Guard path="/ingredients"><CrudPage config={configs.ingredients} /></Guard>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

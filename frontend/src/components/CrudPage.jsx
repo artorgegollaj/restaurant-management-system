@@ -119,6 +119,19 @@ function CrudPage({ config }) {
         />
       );
     }
+    if (f.type === 'select') {
+      return (
+        <select
+          className="form-select"
+          value={form[f.name] ?? ''}
+          onChange={(e) => setForm({ ...form, [f.name]: e.target.value })}
+        >
+          {(f.options || []).map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+      );
+    }
     return (
       <input
         type={f.type || 'text'}

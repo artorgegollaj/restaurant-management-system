@@ -2,6 +2,7 @@ const COLORS = {
   'PENDING': 'warning',
   'Ne pritje': 'warning',
   'IN_PROGRESS': 'info',
+  'Preparing': 'info',
   'Ne pergatitje': 'info',
   'DELIVERED': 'primary',
   'E dorezuar': 'primary',

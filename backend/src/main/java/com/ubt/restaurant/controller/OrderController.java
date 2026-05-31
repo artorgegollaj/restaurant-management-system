@@ -1,5 +1,23 @@
 package com.ubt.restaurant.controller;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.ubt.restaurant.entity.MenuItem;
 import com.ubt.restaurant.entity.OrderEntity;
 import com.ubt.restaurant.entity.OrderItem;
@@ -7,17 +25,9 @@ import com.ubt.restaurant.repository.MenuItemRepository;
 import com.ubt.restaurant.repository.OrderItemRepository;
 import com.ubt.restaurant.repository.OrderRepository;
 import com.ubt.restaurant.repository.RestaurantTableRepository;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @Tag(name = "Orders", description = "Menaxhimi i porosive")
 @RestController
@@ -32,8 +42,8 @@ public class OrderController {
         "PENDING",     Set.of("IN_PROGRESS", "CANCELLED"),
         "IN_PROGRESS", Set.of("DELIVERED", "CANCELLED"),
         "DELIVERED",   Set.of("PAID", "CANCELLED"),
-        "PAID",        Set.of(),       // perfundimtar
-        "CANCELLED",   Set.of()        // perfundimtar
+        "PAID",        Set.of(),       
+        "CANCELLED",   Set.of()        
     );
 
     private final OrderRepository orderRepo;

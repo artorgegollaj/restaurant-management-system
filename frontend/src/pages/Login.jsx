@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite';
 import { authStore } from '../stores/AuthStore';
 import useFormValidation, { validators } from '../hooks/useFormValidation.js';
 import FormField from '../components/FormField.jsx';
+import { landingPath } from '../auth/permissions.js';
 
 const Login = observer(() => {
   const [error, setError] = useState('');
@@ -23,9 +24,7 @@ const Login = observer(() => {
     if (!validate()) return;
     try {
       await authStore.login(values.username, values.password);
-      const roles = authStore.roles;
-      const isUserOnly = roles.length > 0 && roles.every(r => r === 'USER');
-      navigate(isUserOnly ? '/home' : '/');
+      navigate(landingPath(authStore.roles));
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed');
     }

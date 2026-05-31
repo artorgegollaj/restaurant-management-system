@@ -78,7 +78,13 @@ export const configs = {
     title: 'Orders',
     endpoint: '/orders',
     fields: [
-      { name: 'status', label: 'Status', default: 'PENDING', render: (r) => <StatusBadge status={r.status} /> },
+      { name: 'status', label: 'Status', type: 'select', default: 'PENDING',
+        options: [
+          { value: 'PENDING', label: 'Pending' },
+          { value: 'Preparing', label: 'Preparing' },
+          { value: 'DELIVERED', label: 'Done' },
+        ],
+        render: (r) => <StatusBadge status={r.status} /> },
       { name: 'total', label: 'Total', type: 'number', step: '0.01' },
       { name: 'orderType', label: 'Order Type', default: 'DINE_IN' }
     ],

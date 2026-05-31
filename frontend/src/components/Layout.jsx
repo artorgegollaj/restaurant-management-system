@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import { authStore } from '../stores/AuthStore';
+import { allowedPaths } from '../auth/permissions.js';
 
 const links = [
   { to: '/', label: 'Dashboard', end: true },
@@ -26,12 +27,15 @@ const Layout = observer(() => {
     navigate('/login');
   };
 
+  const visible = allowedPaths(authStore.roles);
+  const navLinks = links.filter((l) => visible.includes(l.to));
+
   return (
     <div className="d-flex" style={{ minHeight: '100vh' }}>
       <aside className="text-white p-3" style={{ width: 230, background: '#111111' }}>
         <h5 className="mb-4 fw-bold" style={{ color: '#ff6600', letterSpacing: 2 }}>AURA</h5>
         <nav className="nav flex-column">
-          {links.map((l) => (
+          {navLinks.map((l) => (
             <NavLink
               key={l.to}
               to={l.to}
