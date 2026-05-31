@@ -6,8 +6,10 @@ import com.ubt.restaurant.repository.RestaurantTableRepository;
 
 import jakarta.validation.Valid;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -37,6 +39,7 @@ public class ReservationController {
         if (r.getTable() != null && r.getTable().getId() != null) {
             r.setTable(tableRepo.findById(r.getTable().getId()).orElse(null));
         }
+        checkTableAvailable(r, null);
         return repo.save(r);
     }
 
@@ -52,8 +55,26 @@ public class ReservationController {
             if (r.getTable() != null && r.getTable().getId() != null) {
                 existing.setTable(tableRepo.findById(r.getTable().getId()).orElse(null));
             }
+            checkTableAvailable(existing, existing.getId());
             return ResponseEntity.ok(repo.save(existing));
         }).orElse(ResponseEntity.notFound().build());
+    }
+
+    // Rejects a reservation that double-books a table at the same date and time.
+    // Cancelled reservations don't count. excludeId skips the row being updated.
+    private void checkTableAvailable(Reservation r, Long excludeId) {
+        if (r.getTable() == null || r.getTable().getId() == null
+                || r.getReservationDate() == null || r.getReservationTime() == null) {
+            return;
+        }
+        boolean taken = repo.findByTable_IdAndReservationDateAndStatusNot(
+                r.getTable().getId(), r.getReservationDate(), "CANCELLED").stream()
+            .filter(existing -> excludeId == null || !existing.getId().equals(excludeId))
+            .anyMatch(existing -> r.getReservationTime().equals(existing.getReservationTime()));
+        if (taken) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                "Tavolina eshte e zene per kete date dhe ore");
+        }
     }
 
     @DeleteMapping("/{id}")

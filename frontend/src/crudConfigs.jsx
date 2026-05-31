@@ -67,7 +67,13 @@ export const configs = {
       { name: 'reservationDate', label: 'Date', type: 'date' },
       { name: 'reservationTime', label: 'Time', type: 'time' },
       { name: 'partySize', label: 'Party Size', type: 'number' },
-      { name: 'status', label: 'Status', default: 'PENDING', render: (r) => <StatusBadge status={r.status} /> }
+      { name: 'status', label: 'Status', type: 'select', default: 'PENDING',
+        options: [
+          { value: 'PENDING', label: 'Pending' },
+          { value: 'OCCUPIED', label: 'Occupied' },
+          { value: 'FREE', label: 'Free' },
+        ],
+        render: (r) => <StatusBadge status={r.status} /> }
     ],
     relations: {
       table: { label: 'Table', endpoint: '/tables', display: (t) => `#${t.tableNumber}` }
