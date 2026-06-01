@@ -87,8 +87,9 @@ export const configs = {
       { name: 'status', label: 'Status', type: 'select', default: 'PENDING',
         options: [
           { value: 'PENDING', label: 'Pending' },
-          { value: 'Preparing', label: 'Preparing' },
+          { value: 'IN_PROGRESS', label: 'Preparing' },
           { value: 'DELIVERED', label: 'Done' },
+          { value: 'PAID', label: 'Paid' },
         ],
         render: (r) => <StatusBadge status={r.status} /> },
       { name: 'total', label: 'Total', type: 'number', step: '0.01' },
